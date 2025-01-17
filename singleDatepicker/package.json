@@ -1,7 +1,7 @@
 {
   "name": "single-datepicker-powerbi",
   "description": "Single Datepicker for PowerBI",
-  "version": "1.0.0.0",
+  "version": "1.0.1.0",
   "repository": {
     "type": "github",
     "url": "https://github.com/Wardish/powerbi-single-datepicker"

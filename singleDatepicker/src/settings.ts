@@ -36,39 +36,56 @@ import FormattingSettingsModel = formattingSettings.Model;
  * Data Point Formatting Card
  */
 class DataPointCardSettings extends FormattingSettingsCard {
-    defaultColor = new formattingSettings.ColorPicker({
-        name: "defaultColor",
-        displayName: "Default color",
+    fontControl = new formattingSettings.FontControl({
+        name: "fontFamily",
+        displayName: "フォント",
+        fontFamily: new formattingSettings.FontPicker({
+            name: "fontFamily",
+            displayName: "フォント",
+            value: "Segoe UI, Arial"
+        }),
+        fontSize: new formattingSettings.NumUpDown({
+            name: "fontSize",
+            displayName: "font Size",
+            value: 10,
+            options: {
+                minValue: {
+                    type: powerbi.visuals.ValidatorType.Min,
+                    value: 8,
+                }
+            }
+        }),
+        bold: new formattingSettings.ToggleSwitch({
+            name: "bold",
+            displayName: "Font Size",
+            value: false,
+        }),
+        italic: new formattingSettings.ToggleSwitch({
+            name: "italic",
+            displayName: "Font Size",
+            value: false,
+        }),
+    });
+
+    fontColor = new formattingSettings.ColorPicker({
+        name: "fontColor",
+        displayName: "テキストの色",
         value: { value: "" }
     });
 
-    showAllDataPoints = new formattingSettings.ToggleSwitch({
-        name: "showAllDataPoints",
-        displayName: "Show all",
-        value: true
-    });
-
-    fill = new formattingSettings.ColorPicker({
-        name: "fill",
-        displayName: "Fill",
+    background = new formattingSettings.ColorPicker({
+        name: "background",
+        displayName: "背景色",
         value: { value: "" }
-    });
-
-    fillRule = new formattingSettings.ColorPicker({
-        name: "fillRule",
-        displayName: "Color saturation",
-        value: { value: "" }
-    });
-
-    fontSize = new formattingSettings.NumUpDown({
-        name: "fontSize",
-        displayName: "Text Size",
-        value: 12
     });
 
     name: string = "dataPoint";
-    displayName: string = "Data colors";
-    slices: Array<FormattingSettingsSlice> = [this.defaultColor, this.showAllDataPoints, this.fill, this.fillRule, this.fontSize];
+    displayName: string = "値";
+    slices: Array<FormattingSettingsSlice> = [
+        this.fontControl,
+        this.fontColor,
+        this.background,
+    ];
 }
 
 /**
