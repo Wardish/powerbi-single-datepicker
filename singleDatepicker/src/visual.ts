@@ -25,7 +25,7 @@
 */
 "use strict";
 
-import { format, subDays, startOfMonth, addMonths } from 'date-fns';
+import { format, subDays, startOfMonth, addMonths, startOfDay, parse, parseISO, addDays } from 'date-fns';
 import powerbi from "powerbi-visuals-api";
 import FilterAction = powerbi.FilterAction;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
@@ -69,7 +69,7 @@ export class Visual implements IVisual {
             // ブラウザの機能に基づいた日付ピッカーが表示されることを期待する。
             this.datepickerText.type = "date";
             // ロケールに基づいた日付文字列が得られる
-            this.datepickerText.value = format(subDays(new Date(), 1), "yyyy-MM");
+            this.datepickerText.value = format(subDays(new Date(), 1), "yyyy-MM-dd");
             this.target.appendChild(this.datepickerText);
 
             this.datepickerText.addEventListener("change", (e) => {
@@ -121,22 +121,22 @@ export class Visual implements IVisual {
      * 指定した日付で対象データを絞り込み
      * 00:00:00 - 23:59:59
      * 
-     * @param selectedMonth picked date
+     * @param selectedDate picked date
      * @returns void
      */
-    public applyFilter(selectedMonth: string): void {
+    public applyFilter(selectedDate: string): void {
         // 同一条件で複数回クエリが飛ぶのを抑制
-        if (this.prevCondition === selectedMonth) return;
+        if (this.prevCondition === selectedDate) return;
 
         // 前提条件が整っていない場合はクエリを行わない
         if (!this.visualHost || !this.targetTableName || !this.targetColumnName) return;
 
-        const fromDate = startOfMonth(`${selectedMonth}-01`);
-        const toDate = addMonths(fromDate, 1);
+        const fromDate = startOfDay(parseISO(`${selectedDate}T00:00:00.000+09:00`));
+        const toDate = addDays(fromDate, 1);
 
         let conditions = [];
         // 日付入力があるときだけ検索
-        if (selectedMonth || selectedMonth !== '') {
+        if (selectedDate || selectedDate !== '') {
             // 日付時刻型を決め打ち
             conditions = [
                 {
@@ -144,25 +144,27 @@ export class Visual implements IVisual {
                     value: fromDate.toISOString()
                 },
                 {
-                    operator: "LessThen",
+                    operator: "LessThan",
                     value: toDate.toISOString()
                 }
             ]
             console.log(conditions);
+            // 指定した日付範囲の全ての時刻をFrom-Toで含める
+            let filter: IAdvancedFilter = {
+                $schema: "https://powerbi.com/product/schema#advanced",
+                target: {
+                    table: this.targetTableName,
+                    column: this.targetColumnName
+                },
+                conditions,
+                logicalOperator: "And",
+                filterType: 0
+            }
+            this.visualHost.applyJsonFilter(filter, "general", "filter", FilterAction.merge);
+            this.prevCondition = selectedDate;
+        } else {
+            this.visualHost.applyJsonFilter(null, "general", "filter", FilterAction.merge);
         }
 
-        // 指定した日付範囲の全ての時刻をFrom-Toで含める
-        let filter: IAdvancedFilter = {
-            $schema: "https://powerbi.com/product/schema#advanced",
-            target: {
-                table: this.targetTableName,
-                column: this.targetColumnName
-            },
-            conditions,
-            logicalOperator: "And",
-            filterType: 0
-        }
-        this.visualHost.applyJsonFilter(filter, "general", "filter", FilterAction.merge);
-        this.prevCondition = selectedMonth;
     }
 }

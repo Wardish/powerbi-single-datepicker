@@ -4,7 +4,7 @@
     "displayName": "SingleDatePicker",
     "guid": "singleDatePicker1C0075FEC0604A05BC7287677AA6359A",
     "visualClassName": "Visual",
-    "version": "1.0.1.0",
+    "version": "1.0.2.0",
     "description": "Single Date Picker",
     "supportUrl": "https://www.wardish.jp/",
     "gitHubUrl": "https://github.com/Wardish/powerbi-single-datepicker"
@@ -22,5 +22,5 @@
   "capabilities": "capabilities.json",
   "dependencies": null,
   "stringResources": [],
-  "version": "1.0.0.0"
+  "version": "1.0.2.0"
 }
